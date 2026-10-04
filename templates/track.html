@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AgriChain Product Tracking</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f8e9;
+            color: #333;
+        }
+
+        header {
+            background: #2e7d32;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 850px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2e7d32;
+        }
+
+        .journey {
+            margin-top: 25px;
+        }
+
+        .stage {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .number {
+            min-width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #2e7d32;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .stage-info {
+            flex: 1;
+            background: #f9fff6;
+            border: 1px solid #d8e8d5;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stage-info h3 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+
+        .status {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <h1>🌾 AgriChain</h1>
+
+    <p>Farm-to-Customer Tracking</p>
+
+</header>
+
+
+<div class="container">
+
+
+    <div class="card">
+
+        <h2>📦 Product Details</h2>
+
+        <div id="productInfo">
+            Loading...
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>🚚 Product Journey</h2>
+
+        <div
+            id="journey"
+            class="journey"
+        >
+            Loading...
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+const productId =
+    "{{ product_id }}";
+
+
+async function loadProduct() {
+
+    const response =
+        await fetch(
+            "/product/" + productId
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!data.success) {
+
+        document.getElementById(
+            "productInfo"
+        ).innerHTML =
+            "<p>❌ Product not found.</p>";
+
+        document.getElementById(
+            "journey"
+        ).innerHTML = "";
+
+        return;
+
+    }
+
+
+    const product =
+        data.product;
+
+
+    document.getElementById(
+        "productInfo"
+    ).innerHTML = `
+
+        <p>
+            <b>Product Name:</b>
+            ${product.product_name}
+        </p>
+
+        <p>
+            <b>Product ID:</b>
+            ${product.product_id}
+        </p>
+
+        <p>
+            <b>Farmer:</b>
+            ${product.farmer_name}
+        </p>
+
+        <p>
+            <b>Quantity:</b>
+            ${product.quantity}
+        </p>
+
+        <p>
+            <b>Harvest Date:</b>
+            ${product.harvest_date}
+        </p>
+
+        <div class="status">
+            Current Status:
+            ${product.current_stage}
+        </div>
+
+    `;
+
+
+    const journey =
+        document.getElementById(
+            "journey"
+        );
+
+
+    journey.innerHTML = "";
+
+
+    data.tracking.forEach(
+        (item, index) => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "stage";
+
+
+            div.innerHTML = `
+
+                <div class="number">
+                    ${index + 1}
+                </div>
+
+                <div class="stage-info">
+
+                    <h3>
+                        ${item.stage}
+                    </h3>
+
+                    <p>
+                        <b>Person / Organization:</b>
+                        ${item.person_name || "-"}
+                    </p>
+
+                    <p>
+                        <b>Location:</b>
+                        ${item.location || "-"}
+                    </p>
+
+                    <p>
+                        <b>Notes:</b>
+                        ${item.notes || "-"}
+                    </p>
+
+                    <p>
+                        <b>Date & Time:</b>
+                        ${item.timestamp}
+                    </p>
+
+                </div>
+
+            `;
+
+
+            journey.appendChild(div);
+
+        }
+    );
+
+}
+
+
+loadProduct();
+
+</script>
+
+</body>
+
+</html>

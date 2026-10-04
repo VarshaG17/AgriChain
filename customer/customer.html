@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AgriChain - Customer</title>
+
+    <link rel="stylesheet"
+          href="/customer/customer.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>🌾 AgriChain</h1>
+
+    <p>Customer Product Verification</p>
+
+</header>
+
+
+<div class="container">
+
+    <section class="card">
+
+        <h2>🔍 Track Agricultural Product</h2>
+
+        <p>
+            Enter the Product ID found on the QR code.
+        </p>
+
+
+        <input
+            type="text"
+            id="productId"
+            placeholder="Example: AGR-12345678"
+        >
+
+
+        <button onclick="trackProduct()">
+            Track Product
+        </button>
+
+
+        <p id="message"></p>
+
+    </section>
+
+
+    <section
+        class="card"
+        id="result"
+        style="display:none;"
+    >
+
+        <h2>🌾 Product Information</h2>
+
+        <div id="productInfo"></div>
+
+
+        <h2>🚚 Product Journey</h2>
+
+        <div
+            id="journey"
+            class="journey"
+        ></div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+async function trackProduct() {
+
+    const productId =
+        document.getElementById(
+            "productId"
+        ).value.trim();
+
+
+    if (!productId) {
+
+        document.getElementById(
+            "message"
+        ).innerText =
+            "Please enter Product ID.";
+
+        return;
+
+    }
+
+
+    const response =
+        await fetch(
+            "/product/" + productId
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!data.success) {
+
+        document.getElementById(
+            "message"
+        ).innerText =
+            "❌ Product not found.";
+
+        document.getElementById(
+            "result"
+        ).style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "message"
+    ).innerText = "";
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+
+    const product =
+        data.product;
+
+
+    document.getElementById(
+        "productInfo"
+    ).innerHTML = `
+
+        <p>
+            <b>Product:</b>
+            ${product.product_name}
+        </p>
+
+        <p>
+            <b>Product ID:</b>
+            ${product.product_id}
+        </p>
+
+        <p>
+            <b>Farmer:</b>
+            ${product.farmer_name}
+        </p>
+
+        <p>
+            <b>Quantity:</b>
+            ${product.quantity}
+        </p>
+
+        <p>
+            <b>Harvest Date:</b>
+            ${product.harvest_date}
+        </p>
+
+        <p>
+            <b>Current Status:</b>
+            ${product.current_stage}
+        </p>
+
+    `;
+
+
+    const journey =
+        document.getElementById(
+            "journey"
+        );
+
+
+    journey.innerHTML = "";
+
+
+    data.tracking.forEach(
+        (item, index) => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "journey-item";
+
+
+            div.innerHTML = `
+
+                <div class="circle">
+                    ${index + 1}
+                </div>
+
+                <div class="journey-content">
+
+                    <h3>
+                        ${item.stage}
+                    </h3>
+
+                    <p>
+                        <b>Person/Organization:</b>
+                        ${item.person_name || "-"}
+                    </p>
+
+                    <p>
+                        <b>Location:</b>
+                        ${item.location || "-"}
+                    </p>
+
+                    <p>
+                        <b>Notes:</b>
+                        ${item.notes || "-"}
+                    </p>
+
+                    <p>
+                        <b>Date:</b>
+                        ${item.timestamp}
+                    </p>
+
+                </div>
+
+            `;
+
+
+            journey.appendChild(div);
+
+        }
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>

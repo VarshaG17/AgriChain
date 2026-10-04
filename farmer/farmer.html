@@ -1,0 +1,489 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AgriChain - Farmer</title>
+
+    <link rel="stylesheet"
+          href="/farmer/farmer.css">
+</head>
+
+<body>
+
+<header>
+    <h1>🌾 AgriChain</h1>
+    <p>Farmer Dashboard</p>
+</header>
+
+
+<div class="container">
+
+    <!-- REGISTER PRODUCT -->
+
+    <section class="card">
+
+        <h2>👨‍🌾 Register Agricultural Product</h2>
+
+        <label>Farmer Name</label>
+
+        <input
+            type="text"
+            id="farmerName"
+            placeholder="Enter farmer name"
+        >
+
+
+        <label>Product Name</label>
+
+        <input
+            type="text"
+            id="productName"
+            placeholder="Example: Tomatoes"
+        >
+
+
+        <label>Quantity</label>
+
+        <input
+            type="text"
+            id="quantity"
+            placeholder="Example: 500 kg"
+        >
+
+
+        <label>Harvest Date</label>
+
+        <input
+            type="date"
+            id="harvestDate"
+        >
+
+
+        <button onclick="addProduct()">
+            Add Product
+        </button>
+
+        <p id="addMessage"></p>
+
+    </section>
+
+
+    <!-- QR CODE -->
+
+    <section
+        class="card"
+        id="qrSection"
+        style="display:none;"
+    >
+
+        <h2>📱 Product QR Code</h2>
+
+        <p>
+            This QR code allows the customer to
+            track the product.
+        </p>
+
+        <h3 id="createdProductId"></h3>
+
+        <img
+            id="qrImage"
+            width="200"
+            alt="Product QR Code"
+        >
+
+        <br><br>
+
+        <a
+            id="trackLink"
+            target="_blank"
+        >
+            Open Customer Tracking Page
+        </a>
+
+    </section>
+
+
+    <!-- UPDATE JOURNEY -->
+
+    <section class="card">
+
+        <h2>🚚 Update Product Journey</h2>
+
+        <label>Product ID</label>
+
+        <input
+            type="text"
+            id="updateProductId"
+            placeholder="Example: AGR-12345678"
+        >
+
+
+        <label>Current Stage</label>
+
+        <select id="stage">
+
+            <option value="Collection Center">
+                Collection Center
+            </option>
+
+            <option value="Distributor">
+                Distributor
+            </option>
+
+            <option value="Retailer">
+                Retailer
+            </option>
+
+            <option value="Customer">
+                Customer
+            </option>
+
+        </select>
+
+
+        <label>Person / Organization Name</label>
+
+        <input
+            type="text"
+            id="personName"
+            placeholder="Example: ABC Foods"
+        >
+
+
+        <label>Location</label>
+
+        <input
+            type="text"
+            id="location"
+            placeholder="Example: Bengaluru"
+        >
+
+
+        <label>Notes</label>
+
+        <textarea
+            id="notes"
+            placeholder="Enter additional information"
+        ></textarea>
+
+
+        <button onclick="updateStage()">
+            Update Journey
+        </button>
+
+        <p id="updateMessage"></p>
+
+    </section>
+
+
+    <!-- MY PRODUCTS -->
+
+    <section class="card">
+
+        <h2>📦 My Products</h2>
+
+        <button onclick="loadProducts()">
+            Refresh Products
+        </button>
+
+        <div id="productList"></div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+async function addProduct() {
+
+    const farmerName =
+        document.getElementById("farmerName").value;
+
+    const productName =
+        document.getElementById("productName").value;
+
+    const quantity =
+        document.getElementById("quantity").value;
+
+    const harvestDate =
+        document.getElementById("harvestDate").value;
+
+
+    if (
+        !farmerName ||
+        !productName ||
+        !quantity ||
+        !harvestDate
+    ) {
+
+        document.getElementById(
+            "addMessage"
+        ).innerText =
+            "Please fill all fields.";
+
+        return;
+    }
+
+
+    const response = await fetch(
+        "/add_product",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                farmer_name: farmerName,
+
+                product_name: productName,
+
+                quantity: quantity,
+
+                harvest_date: harvestDate
+
+            })
+        }
+    );
+
+
+    const result =
+        await response.json();
+
+
+    document.getElementById(
+        "addMessage"
+    ).innerText =
+        result.message;
+
+
+    if (result.success) {
+
+        const productId =
+            result.product_id;
+
+
+        document.getElementById(
+            "createdProductId"
+        ).innerText =
+            "Product ID: " + productId;
+
+
+        document.getElementById(
+            "qrImage"
+        ).src =
+            "/qr/" + productId;
+
+
+        document.getElementById(
+            "trackLink"
+        ).href =
+            "/track/" + productId;
+
+
+        document.getElementById(
+            "qrSection"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "updateProductId"
+        ).value =
+            productId;
+
+
+        loadProducts();
+    }
+}
+
+
+
+async function updateStage() {
+
+    const productId =
+        document.getElementById(
+            "updateProductId"
+        ).value;
+
+
+    const stage =
+        document.getElementById(
+            "stage"
+        ).value;
+
+
+    const personName =
+        document.getElementById(
+            "personName"
+        ).value;
+
+
+    const location =
+        document.getElementById(
+            "location"
+        ).value;
+
+
+    const notes =
+        document.getElementById(
+            "notes"
+        ).value;
+
+
+    if (!productId) {
+
+        document.getElementById(
+            "updateMessage"
+        ).innerText =
+            "Please enter Product ID.";
+
+        return;
+    }
+
+
+    const response = await fetch(
+        "/update_stage",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                product_id: productId,
+
+                stage: stage,
+
+                person_name: personName,
+
+                location: location,
+
+                notes: notes
+
+            })
+        }
+    );
+
+
+    const result =
+        await response.json();
+
+
+    document.getElementById(
+        "updateMessage"
+    ).innerText =
+        result.message;
+
+
+    if (result.success) {
+
+        loadProducts();
+    }
+}
+
+
+
+async function loadProducts() {
+
+    const response =
+        await fetch("/products");
+
+
+    const products =
+        await response.json();
+
+
+    const productList =
+        document.getElementById(
+            "productList"
+        );
+
+
+    productList.innerHTML = "";
+
+
+    if (products.length === 0) {
+
+        productList.innerHTML =
+            "<p>No products registered yet.</p>";
+
+        return;
+    }
+
+
+    products.forEach(product => {
+
+        const div =
+            document.createElement("div");
+
+
+        div.className =
+            "product";
+
+
+        div.innerHTML = `
+
+            <h3>
+                🌾 ${product.product_name}
+            </h3>
+
+            <p>
+                <b>Product ID:</b>
+                ${product.product_id}
+            </p>
+
+            <p>
+                <b>Farmer:</b>
+                ${product.farmer_name}
+            </p>
+
+            <p>
+                <b>Quantity:</b>
+                ${product.quantity}
+            </p>
+
+            <p>
+                <b>Harvest Date:</b>
+                ${product.harvest_date}
+            </p>
+
+            <p>
+                <b>Current Stage:</b>
+                ${product.current_stage}
+            </p>
+
+            <a
+                href="/track/${product.product_id}"
+                target="_blank"
+            >
+                View Product Journey
+            </a>
+        `;
+
+
+        productList.appendChild(div);
+
+    });
+}
+
+
+loadProducts();
+
+</script>
+
+</body>
+
+</html>
+```

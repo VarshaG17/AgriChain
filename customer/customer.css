@@ -1,0 +1,104 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f8e9;
+    color: #333;
+}
+
+header {
+    background: #2e7d32;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.card h2 {
+    color: #2e7d32;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+button {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 13px 25px;
+    border-radius: 7px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #1b5e20;
+}
+
+#message {
+    color: #c62828;
+    font-weight: bold;
+}
+
+.journey {
+    margin-top: 20px;
+}
+
+.journey-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.circle {
+    min-width: 45px;
+    height: 45px;
+    background: #2e7d32;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.journey-content {
+    background: #f9fff6;
+    border: 1px solid #d8e8d5;
+    border-radius: 8px;
+    padding: 15px;
+    flex: 1;
+}
+
+.journey-content h3 {
+    margin-top: 0;
+    color: #2e7d32;
+}
